@@ -1,6 +1,6 @@
 export const HOME_BACKGROUND_ANIMATION = {
-  lineGrowDurationMs: 1500,
-  lineStaggerMs: 100,
+  lineGrowDurationMs: 5500,
+  lineStaggerMs: 200,
   centerPlantDelayMs: 350,
-  plantAppearDurationMs: 550,
+  plantAppearDurationMs: 350,
 } as const

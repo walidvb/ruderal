@@ -1,6 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import homeBackgroundSvg from '../assets/home-background.svg?raw'
+import type { HomePlantId } from '../data/home-plants'
+import { getHomePlant } from '../data/home-plants'
+import { fixSvgTextScaling } from '../lib/fix-svg-text-scaling'
 import { HOME_BACKGROUND_ANIMATION } from '../lib/home-background-animation'
 import { buildLineRevealPath } from '../lib/home-background-lines'
 
@@ -172,6 +175,24 @@ function preparePlants(svg: SVGSVGElement) {
   }
 }
 
+function setupPlantLinks(
+  svg: SVGSVGElement,
+  onPlantClick: (id: HomePlantId) => void,
+) {
+  for (const link of svg.querySelectorAll<SVGAElement>('.home-bg-plant-link')) {
+    const id = link.dataset.plantId as HomePlantId | undefined
+    if (!id) continue
+
+    const plant = getHomePlant(id)
+    if (plant) link.setAttribute('aria-label', plant.title)
+
+    link.addEventListener('click', (event) => {
+      event.preventDefault()
+      onPlantClick(id)
+    })
+  }
+}
+
 function runPlantAnimations(
   svg: SVGSVGElement,
   lineEndTimes: LineEndTime[],
@@ -181,13 +202,13 @@ function runPlantAnimations(
     const plant = svg.querySelector<SVGGElement>(selector)
     if (!plant) continue
 
-    let delayMs = lineGrowDurationMs
+    let delayMs: number = lineGrowDurationMs
 
     if (selector === '.home-bg-plant--podcasts') {
       delayMs = centerPlantDelayMs
     } else {
       const plantCenter = getElementCenter(plant)
-      const nearestLineEnd = lineEndTimes.reduce(
+      const nearestLineEnd = lineEndTimes.reduce<{ dist: number; endMs: number }>(
         (best, line) => {
           const dist = Math.hypot(
             line.center.x - plantCenter.x,
@@ -221,6 +242,15 @@ export function HomeBackground() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isReady, setIsReady] = useState(false)
 
+  const handlePlantClick = useCallback((id: HomePlantId) => {
+    const plant = getHomePlant(id)
+    if (!plant) return
+
+    if (plant.url) {
+      window.open(plant.url, '_blank', 'noopener,noreferrer')
+    }
+  }, [])
+
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
@@ -229,6 +259,9 @@ export function HomeBackground() {
 
     const svg = container.querySelector('svg')
     if (!svg) return
+
+    const disconnectTextScaling = fixSvgTextScaling(svg)
+    setupPlantLinks(svg, handlePlantClick)
 
     let cancelled = false
     const reducedMotion = window.matchMedia(
@@ -252,17 +285,18 @@ export function HomeBackground() {
 
     return () => {
       cancelled = true
+      disconnectTextScaling()
     }
-  }, [])
+  }, [handlePlantClick])
 
   return (
     <>
       {!isReady && <div className="home-loading-screen" aria-hidden />}
-      <div
-        ref={containerRef}
-        className={`home-bg${isReady ? ' home-bg--ready' : ''}`}
-        aria-hidden
-      />
+      <div className={`home-bg${isReady ? ' home-bg--ready' : ''}`}>
+        <div className="home-bg-stage">
+          <div ref={containerRef} className="home-bg-svg-host" />
+        </div>
+      </div>
     </>
   )
 }
