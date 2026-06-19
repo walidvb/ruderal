@@ -1,0 +1,55 @@
+
+@import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+
+}
+
+body {
+  margin: 0;
+  background-color: #f5f5f5;
+}
+
+.home-loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: #fff;
+}
+
+.home-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.home-bg--ready {
+  visibility: visible;
+  background-color: #f5f5f5;
+}
+
+.home-bg-svg {
+  width: 100%;
+  max-width: 1440px;
+  height: auto;
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-bg-plant {
+    transform: scale(1);
+  }
+}
