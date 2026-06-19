@@ -54,19 +54,6 @@ body {
   display: block;
 }
 
-.home-bg-svg {
-  --text-factor: 0;
-}
-
-.home-bg-label {
-  font-family: 'Instrument Sans', sans-serif;
-  font-size: calc(20px * var(--text-factor));
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  fill: #000;
-  pointer-events: none;
-}
-
 .home-bg-plant-link {
   cursor: pointer;
 }
@@ -81,4 +68,181 @@ body {
     transform: scale(1);
   }
 
+}
+
+.home-plant-drawer-content {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 10001;
+  width: min(100vw, 520px);
+  height: 100vh;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.home-plant-drawer-content[data-state='open'] {
+  animation: home-plant-drawer-in 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.home-plant-drawer-content[data-state='closed'] {
+  animation: home-plant-drawer-out 200ms ease-in;
+}
+
+.home-plant-drawer-content:focus {
+  outline: none;
+}
+
+.home-plant-drawer-panel {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 2rem;
+  border-left: 1px solid rgb(0 0 0 / 0.08);
+  background: #fff;
+  box-shadow: -12px 0 48px rgb(0 0 0 / 0.08);
+  overflow-y: auto;
+  font-family: 'Instrument Sans', sans-serif;
+  pointer-events: none;
+}
+
+.home-plant-drawer-panel :is(a, button) {
+  pointer-events: auto;
+}
+
+.home-plant-drawer-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  display: flex;
+  padding: 0.25rem;
+  border: 0;
+  background: transparent;
+  color: #000;
+  cursor: pointer;
+}
+
+.home-plant-drawer-close:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 2px;
+}
+
+.home-plant-drawer-title {
+  margin: 0;
+  padding-right: 2rem;
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: #000;
+}
+
+.home-plant-drawer-description {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: #000;
+}
+
+.home-plant-drawer-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.home-plant-drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.home-plant-drawer-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid #000;
+  border-radius: 0.5rem;
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1;
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.home-plant-drawer-more:hover {
+  background: rgb(0 0 0 / 0.04);
+}
+
+.home-plant-drawer-more:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 2px;
+}
+
+@keyframes home-plant-drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes home-plant-drawer-out {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-plant-drawer-content[data-state='open'],
+  .home-plant-drawer-content[data-state='closed'] {
+    animation: none;
+  }
+}
+
+.home-plant-podcast-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #000;
+}
+
+.home-plant-podcast-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.home-plant-podcast-link:hover {
+  text-decoration: underline;
+}
+
+.home-plant-podcast-link--list {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.home-plant-podcast-media {
+  aspect-ratio: 16 / 10;
+  border-radius: 0.75rem;
+  background: #d9d9d9;
 }

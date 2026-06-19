@@ -3,6 +3,7 @@ export type HomePlantId = 'about' | 'podcasts' | 'happenings' | 'study-group'
 export type HomePlant = {
   id: HomePlantId
   title: string
+  dialogTitle?: string
   description: string
   url: string
 }
@@ -18,9 +19,10 @@ export const HOME_PLANTS: HomePlant[] = [
   {
     id: 'podcasts',
     title: 'Podcast',
+    dialogTitle: 'Documenting Artistic Practices and Circulating Knowledge',
     description:
-      'Documenting Artistic Practices and Circulating Knowledge. Ruderal produces and shares editorial and audio content emerging through multidisciplinary artistic practices in conversation with other fields of knowledge. Conceived as a platform for documentation and transmission, the podcast programme gives visibility to creative processes, critical reflections and situated experiences that often remain outside final artistic outputs. Through conversations, recordings and shared narratives, it contributes to building accessible resources that support exchange, reflection and public engagements across disciplines and communities. Attentive to the conditions in which practices emerge, these conversations assemble heterogeneous voices and temporalities, generating a living archive of artistic inquiry and collective imagination.',
-    url: '',
+      'Ruderal produces and shares editorial and audio content emerging through multidisciplinary artistic practices in conversation with other fields of knowledge. Conceived as a platform for documentation and transmission, the podcast programme gives visibility to creative processes, critical reflections and situated experiences that often remain outside final artistic outputs. Through conversations, recordings and shared narratives, it contributes to building accessible resources that support exchange, reflection and public engagements across disciplines and communities. Attentive to the conditions in which practices emerge, these conversations assemble heterogeneous voices and temporalities, generating a living archive of artistic inquiry and collective imagination.',
+    url: '/podcasts',
   },
   {
     id: 'happenings',

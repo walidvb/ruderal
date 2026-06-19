@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import homeBackgroundSvg from '../assets/home-background.svg?raw'
-import type { HomePlantId } from '../data/home-plants'
+import type { HomePlant, HomePlantId } from '../data/home-plants'
 import { getHomePlant } from '../data/home-plants'
-import { fixSvgTextScaling } from '../lib/fix-svg-text-scaling'
+import { getHomePlantContent } from './home-plant-content'
+import { HomePlantDrawer } from './home-plant-drawer'
 import { HOME_BACKGROUND_ANIMATION } from '../lib/home-background-animation'
 import { buildLineRevealPath } from '../lib/home-background-lines'
 
@@ -241,14 +242,17 @@ function runPlantAnimations(
 export function HomeBackground() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isReady, setIsReady] = useState(false)
+  const [selectedPlant, setSelectedPlant] = useState<HomePlant | null>(null)
 
   const handlePlantClick = useCallback((id: HomePlantId) => {
     const plant = getHomePlant(id)
     if (!plant) return
 
-    if (plant.url) {
-      window.open(plant.url, '_blank', 'noopener,noreferrer')
-    }
+    setSelectedPlant(plant)
+  }, [])
+
+  const handleDrawerOpenChange = useCallback((open: boolean) => {
+    if (!open) setSelectedPlant(null)
   }, [])
 
   useEffect(() => {
@@ -260,7 +264,6 @@ export function HomeBackground() {
     const svg = container.querySelector('svg')
     if (!svg) return
 
-    const disconnectTextScaling = fixSvgTextScaling(svg)
     setupPlantLinks(svg, handlePlantClick)
 
     let cancelled = false
@@ -285,7 +288,6 @@ export function HomeBackground() {
 
     return () => {
       cancelled = true
-      disconnectTextScaling()
     }
   }, [handlePlantClick])
 
@@ -297,6 +299,13 @@ export function HomeBackground() {
           <div ref={containerRef} className="home-bg-svg-host" />
         </div>
       </div>
+      <HomePlantDrawer
+        plant={selectedPlant}
+        customContent={
+          selectedPlant ? getHomePlantContent(selectedPlant.id) : null
+        }
+        onOpenChange={handleDrawerOpenChange}
+      />
     </>
   )
 }
