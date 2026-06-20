@@ -15,10 +15,15 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'Ruderal',
       },
     ],
     links: [
+      {
+        rel: 'icon',
+        type: 'image/png',
+        href: '/favicon.png',
+      },
       {
         rel: 'stylesheet',
         href: appCss,
@@ -42,7 +47,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         {children}
         <TanStackDevtools
           config={{
-            position: 'bottom-right',
+            position: 'bottom-left',
           }}
           plugins={[
             {

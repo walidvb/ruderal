@@ -10,6 +10,7 @@ html,
 body,
 #app {
   min-height: 100%;
+  font-size: 20px;
 
 }
 
@@ -177,7 +178,7 @@ body {
   top: 0;
   right: 0;
   z-index: 10001;
-  width: min(100vw, 520px);
+  width: min(100vw, 560px);
   height: 100vh;
   padding: 0;
   border: 0;
@@ -198,26 +199,12 @@ body {
   outline: none;
 }
 
-.home-plant-drawer-panel {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  flex-direction: column;
-  gap: 1.25rem;
-  padding: 2rem;
-  border-left: 1px solid rgb(0 0 0 / 0.08);
-  background: #fff;
-  box-shadow: -12px 0 48px rgb(0 0 0 / 0.08);
-  overflow-y: auto;
-  font-family: 'Instrument Sans', sans-serif;
-  pointer-events: none;
-}
 
 .home-plant-drawer-panel :is(a, button) {
   pointer-events: auto;
 }
 
-.home-plant-drawer-close {
+  .home-plant-drawer-close {
   position: absolute;
   top: 1.25rem;
   right: 1.25rem;

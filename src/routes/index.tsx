@@ -90,6 +90,7 @@ function Home() {
           'relative min-h-screen h-screen w-full mx-auto bg-gray-300',
         )}
       >
+        <h1 className="text-5xl font-semibold fixed top-8 left-8">Ruderal</h1>
         <HomeSVG
           className="absolute w-full h-full"
           onClick={handlePlantClick}
@@ -98,6 +99,7 @@ function Home() {
           plant={selectedPlant}
           customContent={null}
           onOpenChange={handleDrawerOpenChange}
+          onMenuClick={handlePlantClick}
         />
       </main>
     </>
