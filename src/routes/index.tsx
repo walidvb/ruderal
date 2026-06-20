@@ -17,7 +17,10 @@ function Home() {
 
   const handlePlantClick = useCallback((id: HomePlantId) => {
     const plant = HOME_PLANTS.find((plant) => plant.id === id)
-    if (!plant) return
+    if (!plant) {
+      console.log('Plant not found', id)
+      return
+    }
 
     setSelectedPlant(plant)
   }, [])
@@ -28,7 +31,7 @@ function Home() {
   return (
     <>
       <main className={cn('relative min-h-screen h-screen w-full mx-auto ')}>
-        <h1 className="text-5xl font-semibold fixed top-8 left-8">Ruderal</h1>
+        <h1 className="text-4xl font-semibold fixed top-2 left-2">Ruderal</h1>
         <HomeSVG
           className="absolute w-full h-full"
           onClick={handlePlantClick}
@@ -38,6 +41,7 @@ function Home() {
           customContent={null}
           onOpenChange={handleDrawerOpenChange}
           onMenuClick={handlePlantClick}
+          selectedMenu={selectedPlant}
         />
       </main>
     </>

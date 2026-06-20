@@ -15,13 +15,20 @@ type HomePlantDrawerProps = {
   customContent?: ReactNode
   onOpenChange: (open: boolean) => void
   onMenuClick: (id: HomePlantId) => void
+  selectedMenu: HomePlant | null
 }
 
 function isInternalUrl(url: string) {
   return url.startsWith('/')
 }
 
-const TopMenu = (onClick: (id: HomePlantId) => void) => (
+const TopMenu = ({
+  onClick,
+  selectedMenu,
+}: {
+  onClick: (id: HomePlantId) => void
+  selectedMenu: HomePlant | null
+}) => (
   <div className="grid grid-cols-2 md:grid-cols-4 items-center  text-xs pr-10 gap-y-4">
     {HOME_PLANTS.map((plant) => (
       <button
@@ -31,6 +38,7 @@ const TopMenu = (onClick: (id: HomePlantId) => void) => (
           'flex items-center gap-[3px] px-3 cursor-pointer',
           'hover:font-bold',
           'whitespace-nowrap',
+          selectedMenu?.id === plant.id && 'font-bold',
         )}
       >
         <img src={plant.imageSrc} alt={plant.title} className="h-8" />
@@ -46,6 +54,7 @@ export function HomePlantDrawer({
   customContent,
   onOpenChange,
   onMenuClick,
+  selectedMenu,
 }: HomePlantDrawerProps) {
   const title = plant?.dialogTitle ?? plant?.title ?? ''
   const moreUrl = plant?.url
@@ -74,7 +83,7 @@ export function HomePlantDrawer({
             <X size={20} strokeWidth={1.5} />
           </Dialog.Close>
 
-          <TopMenu onClick={onMenuClick} />
+          <TopMenu onClick={onMenuClick} selectedMenu={selectedMenu} />
 
           <hr className="text-gray-300" />
           <div className="inline-flex flex-col grow md:overflow-hidden">

@@ -23,7 +23,7 @@ export const HOME_PLANTS: HomePlant[] = [
     id: 'about',
     title: 'About',
     imageSrc: '/plants/about-plant.png',
-    dialogTitle: 'Documenting Artistic Practices and Circulating Knowledge',
+    dialogTitle: 'Extending ecological logic into cultural realms',
     description: (
       <>
         Ruderal takes its name from the ecological term ruderal, derived from

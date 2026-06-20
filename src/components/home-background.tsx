@@ -234,6 +234,8 @@ export function HomeBackground() {
           selectedPlant ? getHomePlantContent(selectedPlant.id) : null
         }
         onOpenChange={handleDrawerOpenChange}
+        onMenuClick={handlePlantClick}
+        selectedMenu={selectedPlant}
       />
     </>
 	);

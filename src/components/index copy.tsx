@@ -99,6 +99,8 @@ function Home() {
             plant={selectedPlant}
             customContent={null}
             onOpenChange={handleDrawerOpenChange}
+            onMenuClick={handlePlantClick}
+            selectedMenu={selectedPlant}
           />
         </div>
       </main>
