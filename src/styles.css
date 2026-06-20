@@ -62,6 +62,15 @@ body {
   display: block;
 }
 
+.svg-text-sizer {
+  --svg-text-size: 20px;
+  --text-factor: 0;
+}
+
+.svg-text-sizer text {
+  font-size: calc(var(--svg-text-size) * var(--text-factor));
+}
+
 .home-bg-svg #lines {
   visibility: hidden;
 }
