@@ -4,6 +4,8 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import appCss from '../styles.css?url'
 
+const DEFAULT_OG_IMAGE = '/open-graph/home.png'
+
 export const Route = createRootRoute({
   head: () => ({
     meta: [
@@ -16,6 +18,26 @@ export const Route = createRootRoute({
       },
       {
         title: 'Ruderal',
+      },
+      {
+        property: 'og:type',
+        content: 'website',
+      },
+      {
+        property: 'og:title',
+        content: 'Ruderal',
+      },
+      {
+        property: 'og:image',
+        content: DEFAULT_OG_IMAGE,
+      },
+      {
+        name: 'twitter:card',
+        content: 'summary_large_image',
+      },
+      {
+        name: 'twitter:image',
+        content: DEFAULT_OG_IMAGE,
       },
     ],
     links: [

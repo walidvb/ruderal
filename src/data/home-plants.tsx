@@ -66,7 +66,6 @@ export const HOME_PLANTS: HomePlant[] = [
       </>
     ),
     url: '',
-    className: 'h-54',
     positionDesktop: {
       top: 34.6,
       left: 50.68,
