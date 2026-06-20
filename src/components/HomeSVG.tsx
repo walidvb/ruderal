@@ -58,6 +58,7 @@ export const HomeSVG = ({onClick, ...props}) => {
           <g
             id="about"
             role="button"
+            tabIndex={0}
             href="#"
             aria-title="about"
             onClick={() => onClick('about')}
@@ -89,6 +90,7 @@ export const HomeSVG = ({onClick, ...props}) => {
           <g
             id="happenings"
             role="button"
+            tabIndex={0}
             aria-title="happenings"
             onClick={() => onClick('happenings')}
           >
@@ -117,6 +119,7 @@ export const HomeSVG = ({onClick, ...props}) => {
           </g>
           <g
             id="podcasts"
+            tabIndex={0}
             role="button"
             aria-title="podcasts"
             onClick={() => onClick('podcasts')}
@@ -145,6 +148,7 @@ export const HomeSVG = ({onClick, ...props}) => {
             id="study-group"
             role="button"
             aria-title="study-group"
+            tabIndex={0}
             onClick={() => onClick('study-group')}
           >
             <rect
