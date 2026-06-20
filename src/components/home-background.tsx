@@ -1,242 +1,195 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+	type CSSProperties,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 
-import homeBackgroundSvg from '../assets/home-background.svg?raw'
-import type { HomePlant, HomePlantId } from '../data/home-plants'
-import { getHomePlant } from '../data/home-plants'
-import { getHomePlantContent } from './home-plant-content'
-import { HomePlantDrawer } from './home-plant-drawer'
-import { HOME_BACKGROUND_ANIMATION } from '../lib/home-background-animation'
-import { buildLineRevealPath } from '../lib/home-background-lines'
+import bgSvg from "../assets/bg.svg?raw";
+import {
+	getHomePlant,
+	HOME_PLANTS,
+	type HomePlant,
+	type HomePlantId,
+	type HomePlantPosition,
+} from "../data/home-plants";
+import { HOME_BACKGROUND_ANIMATION } from "../lib/home-background-animation";
+import { buildLineRevealPath } from "../lib/home-background-lines";
+import {
+	HomeBackgroundLineAnimations,
+	type LineRevealSetup,
+} from "./home-background-line-animations";
+import { getHomePlantContent } from "./home-plant-content";
+import { HomePlantDrawer } from "./home-plant-drawer";
+import { AnimatedLines } from "./v0-bg-lines-animation";
 
-const ORIGIN = { x: 828, y: 538 }
-const VIEWBOX = { width: 1728, height: 1098 }
-const REVEAL_STROKE_WIDTH = 220
+const ORIGIN = { x: 828, y: 538 };
+const VIEWBOX = { width: 1728, height: 1098 };
+const PLANT_GROUP_IDS = ["about", "happenings", "podcast", "study-group"];
 
-const { lineGrowDurationMs, lineStaggerMs, centerPlantDelayMs, plantAppearDurationMs } =
-  HOME_BACKGROUND_ANIMATION
-
-const PLANT_SELECTORS = [
-  '.home-bg-plant--podcasts',
-  '.home-bg-plant--happenings',
-  '.home-bg-plant--about',
-  '.home-bg-plant--study-group',
-] as const
-
-type RevealPathSetup = {
-  revealPath: SVGPathElement
-  length: number
-  index: number
-}
-
-type LineEndTime = { center: { x: number; y: number }; endMs: number }
+const { plantGrowDurationMs, plantDelaysMs } = HOME_BACKGROUND_ANIMATION;
 
 function getDefs(svg: SVGSVGElement) {
-  let defs = svg.querySelector('defs')
+	let defs = svg.querySelector("defs");
   if (!defs) {
-    defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs')
-    svg.prepend(defs)
+		defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+		svg.prepend(defs);
   }
-  return defs
-}
-
-function getElementCenter(element: SVGGraphicsElement) {
-  const box = element.getBBox()
-  return {
-    x: box.x + box.width / 2,
-    y: box.y + box.height / 2,
-  }
+	return defs;
 }
 
 function waitForSvgImages(svg: SVGSVGElement) {
-  const images = [...svg.querySelectorAll('image')]
+	const images = [...svg.querySelectorAll("image")];
 
   return Promise.all(
     images.map(
       (image) =>
         new Promise<void>((resolve) => {
           const href =
-            image.getAttribute('href') ?? image.getAttribute('xlink:href') ?? ''
+						image.getAttribute("href") ??
+						image.getAttribute("xlink:href") ??
+						"";
 
-          if (href.startsWith('data:')) {
-            resolve()
-            return
+					if (href.startsWith("data:")) {
+						resolve();
+						return;
           }
 
-          image.addEventListener('load', () => resolve(), { once: true })
-          image.addEventListener('error', () => resolve(), { once: true })
+					image.addEventListener("load", () => resolve(), { once: true });
+					image.addEventListener("error", () => resolve(), { once: true });
         }),
     ),
-  )
+	);
 }
 
 async function waitUntilPageReady(svg: SVGSVGElement) {
-  if (document.readyState !== 'complete') {
+	if (document.readyState !== "complete") {
     await new Promise<void>((resolve) => {
-      window.addEventListener('load', () => resolve(), { once: true })
-    })
+			window.addEventListener("load", () => resolve(), { once: true });
+		});
   }
 
-  await waitForSvgImages(svg)
+	await waitForSvgImages(svg);
   await new Promise<void>((resolve) => {
-    requestAnimationFrame(() => resolve())
-  })
+		requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+	});
 }
+
+function applyAnimationVars(stage: HTMLElement) {
+	stage.style.setProperty(
+		"--home-plant-grow-duration",
+		`${plantGrowDurationMs}ms`,
+	);
+}
+
+function removeSvgPlants(svg: SVGSVGElement) {
+	for (const id of PLANT_GROUP_IDS) {
+		svg.querySelector(`#${CSS.escape(id)}`)?.remove();
+    }
+  }
 
 function prepareLineMasks(svg: SVGSVGElement) {
-  const defs = getDefs(svg)
-  const paths = [...svg.querySelectorAll<SVGPathElement>('.home-bg-line')]
-  const revealPaths: RevealPathSetup[] = []
+	const defs = getDefs(svg);
+	const paths = [...svg.querySelectorAll<SVGPathElement>("#lines path")];
+	const reveals: LineRevealSetup[] = [];
 
-  paths.forEach((path, index) => {
-    const revealD = buildLineRevealPath(path, ORIGIN)
-    if (!revealD) return
+	paths.forEach((path, index) => {
+		const reveal = buildLineRevealPath(path, ORIGIN);
+		if (!reveal) return;
 
-    const wrapper = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-    path.parentNode?.insertBefore(wrapper, path)
-    wrapper.appendChild(path)
+		const wrapper = document.createElementNS("http://www.w3.org/2000/svg", "g");
+		wrapper.classList.add("home-bg-line");
+		path.parentNode?.insertBefore(wrapper, path);
+		wrapper.appendChild(path);
 
-    const maskId = `home-bg-line-mask-${index + 1}`
-    const mask = document.createElementNS('http://www.w3.org/2000/svg', 'mask')
-    mask.id = maskId
-    mask.setAttribute('maskUnits', 'userSpaceOnUse')
-    mask.setAttribute('x', '0')
-    mask.setAttribute('y', '0')
-    mask.setAttribute('width', String(VIEWBOX.width))
-    mask.setAttribute('height', String(VIEWBOX.height))
+		const maskId = `home-bg-line-mask-${index + 1}`;
+		const mask = document.createElementNS("http://www.w3.org/2000/svg", "mask");
+		mask.id = maskId;
+		mask.setAttribute("maskUnits", "userSpaceOnUse");
+		mask.setAttribute("x", "0");
+		mask.setAttribute("y", "0");
+		mask.setAttribute("width", String(VIEWBOX.width));
+		mask.setAttribute("height", String(VIEWBOX.height));
 
-    const maskBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-    maskBg.setAttribute('width', String(VIEWBOX.width))
-    maskBg.setAttribute('height', String(VIEWBOX.height))
-    maskBg.setAttribute('fill', 'black')
-    mask.appendChild(maskBg)
+		const maskBg = document.createElementNS(
+			"http://www.w3.org/2000/svg",
+			"rect",
+		);
+		maskBg.setAttribute("width", String(VIEWBOX.width));
+		maskBg.setAttribute("height", String(VIEWBOX.height));
+		maskBg.setAttribute("fill", "black");
+		mask.appendChild(maskBg);
 
-    const revealPath = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-    revealPath.setAttribute('d', revealD)
-    revealPath.setAttribute('fill', 'none')
-    revealPath.setAttribute('stroke', 'white')
-    revealPath.setAttribute('stroke-width', String(REVEAL_STROKE_WIDTH))
-    revealPath.setAttribute('stroke-linecap', 'round')
-    revealPath.setAttribute('stroke-linejoin', 'round')
-    mask.appendChild(revealPath)
+		defs.appendChild(mask);
+		wrapper.setAttribute("mask", `url(#${maskId})`);
 
-    defs.appendChild(mask)
-    wrapper.setAttribute('mask', `url(#${maskId})`)
+		reveals.push({ mask, d: reveal.d, length: reveal.length, index });
+	});
 
-    const length = revealPath.getTotalLength()
-    revealPath.style.strokeDasharray = `${length}`
-    revealPath.style.strokeDashoffset = `${length}`
-
-    revealPaths.push({ revealPath, length, index })
-  })
-
-  return revealPaths
-}
-
-function runLineAnimations(
-  revealPaths: RevealPathSetup[],
-  reducedMotion: boolean,
-) {
-  const lineEndTimes: LineEndTime[] = []
-
-  for (const { revealPath, length, index } of revealPaths) {
-    const delayMs = index * lineStaggerMs
-
-    if (reducedMotion) {
-      revealPath.style.strokeDashoffset = '0'
-    } else {
-      revealPath.animate(
-        [{ strokeDashoffset: length }, { strokeDashoffset: 0 }],
-        {
-          duration: lineGrowDurationMs,
-          delay: delayMs,
-          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-          fill: 'forwards',
-        },
-      )
+	return reveals;
     }
 
-    const tip = revealPath.getPointAtLength(length)
-    lineEndTimes.push({
-      center: tip,
-      endMs: delayMs + lineGrowDurationMs,
-    })
-  }
-
-  return lineEndTimes
-}
-
-function preparePlants(svg: SVGSVGElement) {
-  for (const selector of PLANT_SELECTORS) {
-    const plant = svg.querySelector<SVGGElement>(selector)
-    if (!plant) continue
-
-    plant.style.transformBox = 'fill-box'
-    plant.style.transformOrigin = 'center'
-    plant.style.transform = 'scale(0)'
-  }
-}
-
-function setupPlantLinks(
-  svg: SVGSVGElement,
-  onPlantClick: (id: HomePlantId) => void,
-) {
-  for (const link of svg.querySelectorAll<SVGAElement>('.home-bg-plant-link')) {
-    const id = link.dataset.plantId as HomePlantId | undefined
-    if (!id) continue
-
-    const plant = getHomePlant(id)
-    if (plant) link.setAttribute('aria-label', plant.title)
-
-    link.addEventListener('click', (event) => {
-      event.preventDefault()
-      onPlantClick(id)
-    })
-  }
-}
-
-function runPlantAnimations(
-  svg: SVGSVGElement,
-  lineEndTimes: LineEndTime[],
-  reducedMotion: boolean,
-) {
-  for (const selector of PLANT_SELECTORS) {
-    const plant = svg.querySelector<SVGGElement>(selector)
-    if (!plant) continue
-
-    let delayMs: number = lineGrowDurationMs
-
-    if (selector === '.home-bg-plant--podcasts') {
-      delayMs = centerPlantDelayMs
-    } else {
-      const plantCenter = getElementCenter(plant)
-      const nearestLineEnd = lineEndTimes.reduce<{ dist: number; endMs: number }>(
-        (best, line) => {
-          const dist = Math.hypot(
-            line.center.x - plantCenter.x,
-            line.center.y - plantCenter.y,
-          )
-          return dist < best.dist ? { dist, endMs: line.endMs } : best
-        },
-        { dist: Number.POSITIVE_INFINITY, endMs: lineGrowDurationMs },
-      )
-      delayMs = nearestLineEnd.endMs
+function plantPositionVars(position: HomePlantPosition) {
+	return {
+		"--plant-top": `${position.top}%`,
+		"--plant-left": `${position.left}%`,
+		"--label-top": `${position.labelTop}%`,
+		"--label-left": `${position.labelLeft}%`,
+	} as CSSProperties;
     }
 
-    if (reducedMotion) {
-      plant.style.transform = 'scale(1)'
-      continue
-    }
+type HomeBgPlantProps = {
+	plant: HomePlant;
+	shouldAnimate: boolean;
+	reducedMotion: boolean;
+	onClick: (id: HomePlantId) => void;
+};
 
-    plant.animate(
-      [{ transform: 'scale(0)' }, { transform: 'scale(1)' }],
+function HomeBgPlant({
+	plant,
+	shouldAnimate,
+	reducedMotion,
+	onClick,
+}: HomeBgPlantProps) {
+	const shown = reducedMotion || shouldAnimate;
+
+	return (
+		<div
+			className={[
+				"home-bg-plant",
+				shown && "home-bg-plant--shown",
+				shouldAnimate && "home-bg-plant--animate",
+			]
+				.filter(Boolean)
+				.join(" ")}
+			style={
       {
-        duration: plantAppearDurationMs,
-        delay: delayMs,
-        easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
-        fill: 'forwards',
-      },
-    )
+					...plantPositionVars(plant.positionMobile),
+					"--plant-top-desktop": `${plant.positionDesktop.top}%`,
+					"--plant-left-desktop": `${plant.positionDesktop.left}%`,
+					"--label-top-desktop": `${plant.positionDesktop.labelTop}%`,
+					"--label-left-desktop": `${plant.positionDesktop.labelLeft}%`,
+					"--home-plant-delay": `${plantDelaysMs[plant.id]}ms`,
+				} as CSSProperties
   }
+		>
+			<button
+				type="button"
+				className="home-bg-plant-btn"
+				aria-label={plant.title}
+				onClick={() => onClick(plant.id)}
+			>
+				<img
+					className="home-bg-plant-image"
+					src={plant.imageSrc}
+					alt=""
+					draggable={false}
+				/>
+			</button>
+			<span className="home-bg-plant-label">{plant.title}</span>
+		</div>
+	);
 }
 
 export function HomeBackground() {
@@ -255,48 +208,24 @@ export function HomeBackground() {
     if (!open) setSelectedPlant(null)
   }, [])
 
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    container.innerHTML = homeBackgroundSvg
-
-    const svg = container.querySelector('svg')
-    if (!svg) return
-
-    setupPlantLinks(svg, handlePlantClick)
-
-    let cancelled = false
-    const reducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches
-
-    const revealPaths = prepareLineMasks(svg)
-    preparePlants(svg)
-
-    waitUntilPageReady(svg).then(() => {
-      if (cancelled) return
-
-      setIsReady(true)
-
-      requestAnimationFrame(() => {
-        if (cancelled) return
-        const lineEndTimes = runLineAnimations(revealPaths, reducedMotion)
-        runPlantAnimations(svg, lineEndTimes, reducedMotion)
-      })
-    })
-
-    return () => {
-      cancelled = true
-    }
-  }, [handlePlantClick])
-
   return (
     <>
-      {!isReady && <div className="home-loading-screen" aria-hidden />}
-      <div className={`home-bg${isReady ? ' home-bg--ready' : ''}`}>
-        <div className="home-bg-stage">
-          <div ref={containerRef} className="home-bg-svg-host" />
+			<div>
+				<div  className="home-bg-stage">
+					<div className="home-bg-svg-host" />
+          {/* <AnimatedLines /> */}
+          <img src="/assets/bg.svg" />
+					<div className="home-bg-plants">
+						{HOME_PLANTS.map((plant) => (
+              <HomeBgPlant
+                key={plant.id}
+                plant={plant}
+                shouldAnimate={true}
+
+                onClick={handlePlantClick}
+              />
+            ))}
+					</div>
         </div>
       </div>
       <HomePlantDrawer
@@ -307,5 +236,5 @@ export function HomeBackground() {
         onOpenChange={handleDrawerOpenChange}
       />
     </>
-  )
+	);
 }

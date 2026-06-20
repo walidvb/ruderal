@@ -1,17 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { HomeBackground } from '../components/home-background'
-import {
-  HOME_PLANTS,
-  type HomePlant,
-  type HomePlantId,
-} from '#/data/home-plants'
+import { HomeBackground } from './home-background'
+import { HOME_PLANTS, type HomePlant } from '#/data/home-plants'
 import { HomePlantDrawer } from '#/components/home-plant-drawer'
 import { useCallback, useState, type CSSProperties } from 'react'
 import { cn } from '#/lib/cn'
-import { HomeSVG } from '#/components/HomeSVG'
 
-export const Route = createFileRoute('/')({ component: Home })
+export const Route = createFileRoute('/index copy')({ component: Home })
 
 function HomeBgPlant({
   plant,
@@ -73,7 +68,7 @@ function HomeBgPlant({
 function Home() {
   const [selectedPlant, setSelectedPlant] = useState<HomePlant | null>(null)
 
-  const handlePlantClick = useCallback((id: HomePlantId) => {
+  const handlePlantClick = useCallback((id: number) => {
     const plant = HOME_PLANTS.find((plant) => plant.id === id)
     if (!plant) return
 
@@ -87,18 +82,25 @@ function Home() {
     <>
       <main
         className={cn(
-          'relative min-h-screen h-screen w-full mx-auto bg-gray-300',
+          'relative z-[1] min-h-screen h-screen container mx-auto bg-gray-300',
+          'bg-contain bg-center bg-no-repeat bg-[url(/assets/bg.svg)]',
         )}
       >
-        <HomeSVG
-          className="absolute w-full h-full"
-          onClick={handlePlantClick}
-        />
-        <HomePlantDrawer
-          plant={selectedPlant}
-          customContent={null}
-          onOpenChange={handleDrawerOpenChange}
-        />
+        <div className="">
+          {HOME_PLANTS.map((plant) => (
+            <HomeBgPlant
+              key={plant.id}
+              plant={plant}
+              shouldAnimate={true}
+              onClick={handlePlantClick}
+            />
+          ))}
+          <HomePlantDrawer
+            plant={selectedPlant}
+            customContent={null}
+            onOpenChange={handleDrawerOpenChange}
+          />
+        </div>
       </main>
     </>
   )

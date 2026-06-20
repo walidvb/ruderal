@@ -1,5 +1,6 @@
 
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 * {
   box-sizing: border-box;
@@ -45,29 +46,121 @@ body {
   width: 100%;
   max-width: 1440px;
   aspect-ratio: 1728 / 1098;
+  --home-line-grow-duration: 6s;
+  --home-line-stagger: 200ms;
+  --home-plant-grow-duration: 350ms;
 }
 
-.home-bg-svg-host,
+.home-bg-svg-host {
+  width: 100%;
+  height: 100%;
+}
+
 .home-bg-svg-host svg {
   width: 100%;
   height: 100%;
   display: block;
 }
 
-.home-bg-plant-link {
-  cursor: pointer;
+.home-bg-svg #lines {
+  visibility: hidden;
 }
 
-.home-bg-plant-link:focus-visible {
+.home-bg--lines-visible .home-bg-svg #lines {
+  visibility: visible;
+}
+
+.home-bg-plants {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.home-bg--ready .home-bg-plants {
+  visibility: visible;
+}
+
+.home-bg-plant {
+  position: absolute;
+  inset: 0;
+}
+
+.home-bg-plant-btn {
+  position: absolute;
+  top: var(--plant-top);
+  left: var(--plant-left);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  transform: scale(0);
+  transform-origin: top left;
+}
+
+.home-bg-plant-image {
+  display: block;
+  width: var(--home-plant-width);
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.home-bg-plant-label {
+  position: absolute;
+  top: var(--label-top);
+  left: var(--label-left);
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: #000;
+  pointer-events: none;
+  user-select: none;
+}
+
+.home-bg-plant--animate .home-bg-plant-btn {
+  animation: home-plant-grow var(--home-plant-grow-duration)
+    cubic-bezier(0.34, 1.56, 0.64, 1) var(--home-plant-delay) forwards;
+}
+
+.home-bg-plant--shown .home-bg-plant-btn {
+  transform: scale(1);
+}
+
+.home-bg-plant-btn:focus-visible {
   outline: 2px solid #000;
   outline-offset: 2px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .home-bg-plant {
+@keyframes home-plant-grow {
+  to {
     transform: scale(1);
   }
+}
 
+@media (min-width: 768px) {
+  .home-bg-plant-btn {
+    top: var(--plant-top-desktop, var(--plant-top));
+    left: var(--plant-left-desktop, var(--plant-left));
+  }
+
+  .home-bg-plant-label {
+    top: var(--label-top-desktop, var(--label-top));
+    left: var(--label-left-desktop, var(--label-left));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-bg-svg #lines {
+    visibility: visible;
+  }
+
+  .home-bg-plant-btn {
+    animation: none;
+  }
 }
 
 .home-plant-drawer-content {

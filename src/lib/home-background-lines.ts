@@ -1,61 +1,70 @@
-const SAMPLE_COUNT = 160
+const SAMPLE_COUNT = 160;
 
-type Point = { x: number; y: number; dist: number; t: number }
+type Point = { x: number; y: number; dist: number; t: number };
 
 function samplePath(path: SVGPathElement, origin: { x: number; y: number }) {
-  const length = path.getTotalLength()
-  const points: Point[] = []
+	const length = path.getTotalLength();
+	const points: Point[] = [];
 
-  for (let i = 0; i <= SAMPLE_COUNT; i++) {
-    const t = (i / SAMPLE_COUNT) * length
-    const pt = path.getPointAtLength(t)
-    points.push({
-      x: pt.x,
-      y: pt.y,
-      dist: Math.hypot(pt.x - origin.x, pt.y - origin.y),
-      t,
-    })
-  }
+	for (let i = 0; i <= SAMPLE_COUNT; i++) {
+		const t = (i / SAMPLE_COUNT) * length;
+		const pt = path.getPointAtLength(t);
+		points.push({
+			x: pt.x,
+			y: pt.y,
+			dist: Math.hypot(pt.x - origin.x, pt.y - origin.y),
+			t,
+		});
+	}
 
-  return { points, length }
+	return { points, length };
 }
 
 function getArc(points: Point[], from: number, to: number) {
-  if (from <= to) {
-    return points.slice(from, to + 1)
-  }
+	if (from <= to) {
+		return points.slice(from, to + 1);
+	}
 
-  return [...points.slice(from), ...points.slice(0, to + 1)]
+	return [...points.slice(from), ...points.slice(0, to + 1)];
 }
 
 export function buildLineRevealPath(
-  path: SVGPathElement,
-  origin: { x: number; y: number },
+	path: SVGPathElement,
+	origin: { x: number; y: number },
 ) {
-  const { points } = samplePath(path, origin)
+	const { points } = samplePath(path, origin);
 
-  let closestIdx = 0
-  let farthestIdx = 0
+	let closestIdx = 0;
+	let farthestIdx = 0;
 
-  for (let i = 0; i < points.length; i++) {
-    if (points[i].dist < points[closestIdx].dist) closestIdx = i
-    if (points[i].dist > points[farthestIdx].dist) farthestIdx = i
-  }
+	for (let i = 0; i < points.length; i++) {
+		if (points[i].dist < points[closestIdx].dist) closestIdx = i;
+		if (points[i].dist > points[farthestIdx].dist) farthestIdx = i;
+	}
 
-  const forward = getArc(points, closestIdx, farthestIdx)
-  const backward = getArc(points, farthestIdx, closestIdx).reverse()
-  const arc =
-    forward[forward.length - 1].dist >= forward[0].dist ? forward : backward
+	const forward = getArc(points, closestIdx, farthestIdx);
+	const backward = getArc(points, farthestIdx, closestIdx).reverse();
+	const arc =
+		forward[forward.length - 1].dist >= forward[0].dist ? forward : backward;
 
-  if (arc.length < 2) return ''
+	if (arc.length < 2) return null;
 
-  return arc.reduce(
-    (d, point, index) =>
-      index === 0 ? `M ${point.x} ${point.y}` : `${d} L ${point.x} ${point.y}`,
-    '',
-  )
+	const orderedArc =
+		arc[0].dist <= arc[arc.length - 1].dist ? arc : [...arc].reverse();
+
+	const d = orderedArc.reduce(
+		(path, point, index) =>
+			index === 0
+				? `M ${point.x} ${point.y}`
+				: `${path} L ${point.x} ${point.y}`,
+		"",
+	);
+
+	return { d, length: measurePathLength(d) };
 }
 
-export function getPathRevealLength(revealPath: SVGPathElement) {
-  return revealPath.getTotalLength()
+export function measurePathLength(d: string) {
+	const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+	path.setAttribute("d", d);
+	return path.getTotalLength();
 }
