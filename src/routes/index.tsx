@@ -8,7 +8,7 @@ import {
 import { HomePlantDrawer } from '#/components/home-plant-drawer'
 import { useCallback, useState, type CSSProperties } from 'react'
 import { cn } from '#/lib/cn'
-import { HomeSVG } from '#/components/HomeSVG'
+import ResponsiveHomeSVG from '#/components/HomeSVG'
 
 export const Route = createFileRoute('/')({ component: Home })
 
@@ -32,7 +32,7 @@ function Home() {
     <>
       <main className={cn('relative min-h-screen h-screen w-full mx-auto ')}>
         <h1 className="text-4xl font-semibold fixed top-2 left-2">Ruderal</h1>
-        <HomeSVG
+        <ResponsiveHomeSVG
           className="absolute w-full h-full"
           onClick={handlePlantClick}
         />
