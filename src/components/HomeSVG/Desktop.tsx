@@ -1,6 +1,6 @@
 import { SVGTextSizer } from '#/components/SVGTextSizer'
 
-export const HomeSVG = ({onClick, ...props}) => {
+export const HomeSVG = ({ onClick, selectedMenu, ...props }) => {
   return (
     <SVGTextSizer
       width="1728"
@@ -64,14 +64,13 @@ export const HomeSVG = ({onClick, ...props}) => {
             href="#"
             aria-title="about"
             onClick={() => onClick('about')}
-            className="group origin-center"
           >
             <g id="Frame 27">
               <rect
                 id="about-plant"
                 width="150.64"
                 height="229.723"
-                transform="matrix(-0.378943 0.92542 0.92542 0.378943 918.689 376.678)"
+                transform="matrix(-0.378943 0.92542 0.92542 0.378943 892.689 376.678)"
                 fill="url(#pattern0_134_119)"
               />
             </g>
@@ -79,11 +78,9 @@ export const HomeSVG = ({onClick, ...props}) => {
               id="About"
               fill="black"
               xmlSpace="preserve"
-              font-family="Instrument Sans"
-              font-weight="500"
               letter-spacing="-0.02em"
             >
-              <tspan x="854" y="415.2">
+              <tspan x="828" y="415.2">
                 About
               </tspan>
             </text>
@@ -104,14 +101,7 @@ export const HomeSVG = ({onClick, ...props}) => {
                 fill="url(#pattern1_134_119)"
               />
             </g>
-            <text
-              id="Happenings"
-              fill="black"
-              xmlSpace="preserve"
-              font-family="Instrument Sans"
-              font-weight="500"
-              letter-spacing="-0.02em"
-            >
+            <text id="Happenings" fill="black" xmlSpace="preserve">
               <tspan x="850" y="761.2">
                 Happenings
               </tspan>
@@ -131,13 +121,7 @@ export const HomeSVG = ({onClick, ...props}) => {
               transform="matrix(-1 0 0 1 594 470)"
               fill="url(#pattern2_134_119)"
             />
-            <text
-              id="Podcast"
-              fill="black"
-              xmlSpace="preserve"
-              font-family="Instrument Sans"
-              letter-spacing="-0.02em"
-            >
+            <text id="Podcast" fill="black" xmlSpace="preserve">
               <tspan x="289" y="447.2">
                 Podcast
               </tspan>
@@ -159,14 +143,7 @@ export const HomeSVG = ({onClick, ...props}) => {
               transform="rotate(-123.347 326.795 1036.58)"
               fill="url(#pattern3_134_119)"
             />
-            <text
-              id="Study group"
-              fill="black"
-              xmlSpace="preserve"
-              font-family="Instrument Sans"
-              font-weight="500"
-              letter-spacing="-0.02em"
-            >
+            <text id="Study group" fill="black" xmlSpace="preserve">
               <tspan x="255.904" y="791.2">
                 Study group
               </tspan>

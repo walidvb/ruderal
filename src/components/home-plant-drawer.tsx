@@ -68,9 +68,10 @@ export function HomePlantDrawer({
       <Dialog.Portal>
         <Dialog.Content
           className={cn(
-            'bg-white/70 backdrop-blur-sm',
+            'bg-[#f5f5f5]/70 backdrop-blur-sm',
             'fixed right-0 top-0 bottom-0',
             'w-[min(100vw,660px)]',
+            'rounded-l-xl',
             'p-4',
             'flex flex-col gap-4',
             'overflow-auto',

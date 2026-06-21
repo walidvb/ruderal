@@ -335,3 +335,9 @@ body {
   border-radius: 0.75rem;
   background: #d9d9d9;
 }
+
+
+svg g:focus{
+  outline: 0;
+  font-weight: bold;
+}
