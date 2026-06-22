@@ -32,10 +32,7 @@ function Home() {
     <>
       <main className={cn('relative min-h-screen h-screen w-full mx-auto ')}>
         <h1 className="text-4xl font-semibold fixed top-2 left-2">Ruderal</h1>
-        <ResponsiveHomeSVG
-          className="absolute w-full h-full"
-          onClick={handlePlantClick}
-        />
+        <ResponsiveHomeSVG onClick={handlePlantClick} />
         <HomePlantDrawer
           plant={selectedPlant}
           customContent={null}
