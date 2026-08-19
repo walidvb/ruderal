@@ -1,0 +1,23 @@
+{
+  "kind": "singleType",
+  "collectionName": "podcast_page",
+  "info": {
+    "singularName": "podcast-page",
+    "pluralName": "podcast-pages",
+    "displayName": "Podcast Page",
+    "description": "Page content for the podcasts page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    }
+  }
+}

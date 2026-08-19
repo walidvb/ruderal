@@ -1,0 +1,23 @@
+{
+  "kind": "singleType",
+  "collectionName": "happening_page",
+  "info": {
+    "singularName": "happening-page",
+    "pluralName": "happening-pages",
+    "displayName": "Happening Page",
+    "description": "Page content for the happening page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "study_groups",
+  "info": {
+    "singularName": "study-group",
+    "pluralName": "study-groups",
+    "displayName": "Study Group",
+    "description": "Study group sessions"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "date": {
+      "type": "date"
+    }
+  }
+}

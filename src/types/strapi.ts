@@ -52,6 +52,45 @@ export type TArticle = {
   publishedAt: string
 }
 
+// Podcast content type
+export type TPodcast = {
+  id: number
+  documentId: string
+  title: string
+  description?: string
+  thumbnail?: TImage
+  videoURL?: string
+  date?: string
+  tags?: Array<string>
+  createdAt: string
+  updatedAt: string
+  publishedAt: string
+}
+
+// Study group content type
+export type TStudyGroup = {
+  id: number
+  documentId: string
+  title: string
+  description?: string
+  image?: TImage
+  date?: string
+  createdAt: string
+  updatedAt: string
+  publishedAt: string
+}
+
+// Shared shape of the page single types (podcast, study group, happening, about)
+export type TPage = {
+  id: number
+  documentId: string
+  title: string
+  description?: string
+  createdAt: string
+  updatedAt: string
+  publishedAt: string
+}
+
 // Strapi response wrappers
 export type TStrapiResponseSingle<T> = {
   data: T

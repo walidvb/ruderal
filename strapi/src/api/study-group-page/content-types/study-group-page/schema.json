@@ -1,0 +1,23 @@
+{
+  "kind": "singleType",
+  "collectionName": "study_group_page",
+  "info": {
+    "singularName": "study-group-page",
+    "pluralName": "study-group-pages",
+    "displayName": "Study Group Page",
+    "description": "Page content for the study group page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    }
+  }
+}
