@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+/*
+ * Design tokens from the Figma "Navegation" section. That file defines no Figma
+ * variables, so these are its raw values promoted to theme tokens — reach for
+ * `bg-surface`, `shadow-card` and friends rather than repeating the literals.
+ */
+@theme {
+  /* Page canvas, and the translucent panel that floats on top of it. */
+  --color-canvas: #f5f5f5;
+  --color-surface: rgb(245 245 245 / 0.3);
+  /* Image/video placeholder: shown before media loads, or when a row has none. */
+  --color-media: #d9d9d9;
+  /* 1px divider under a card header. */
+  --color-rule: #aeabab;
+  /* "OPEN CALL POSTER" overlay. */
+  --color-accent: #ff0202;
+
+  --text-wordmark: 4rem;
+  --tracking-brand: -0.02em;
+  --leading-caption: 1.4;
+
+  --radius-card: 0.75rem;
+  --blur-card: 12px;
+  --shadow-card:
+    -2px -2px 3px rgb(0 0 0 / 0.05), 2px 2px 3px rgb(0 0 0 / 0.05);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  /* Instrument Sans carries the UI; Inter is used only for small captions. */
+  --font-display: var(--font-instrument-sans), ui-sans-serif, system-ui,
+    sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}

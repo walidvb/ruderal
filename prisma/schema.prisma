@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// Next Admin's generator must come *after* the Prisma client generator.
+generator nextAdmin {
+  provider = "next-admin-generator-prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Publishing is enforced by RLS, not by app code: `published_at` null means
+/// draft, a past date means live, a future date means scheduled.
+model Podcast {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug         String?   @unique
+  title        String
+  description  String?
+  thumbnailUrl String?   @map("thumbnail_url")
+  videoUrl     String?   @map("video_url")
+  /// Editorial date, distinct from `published_at`. Listings order by this.
+  date         DateTime? @db.Date
+  tags         String[]  @default([])
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  publishedAt  DateTime? @map("published_at") @db.Timestamptz(6)
+
+  @@index([publishedAt])
+  @@index([date(sort: Desc)])
+  @@map("podcasts")
+}
+
+model StudyGroup {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug        String?   @unique
+  title       String
+  description String?
+  imageUrl    String?   @map("image_url")
+  date        DateTime? @db.Date
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(6)
+
+  @@index([publishedAt])
+  @@index([date(sort: Desc)])
+  @@map("study_groups")
+}
+
+/// Singleton copy for the static pages — one row per page, keyed by slug.
+/// Expected slugs: podcast-page, study-group-page, happening-page, about-page.
+model Page {
+  slug        String    @id
+  title       String
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(6)
+
+  @@index([publishedAt])
+  @@map("pages")
+}
+
+/// Allowlist for the admin UI. An email here can request a magic link at
+/// /admin/login; everything else is rejected. Deliberately *not* a foreign key
+/// to `auth.users` — the row is what grants access, and the Supabase user is
+/// created on first sign-in.
+model Admin {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  /// Stored lowercase — a CHECK constraint enforces it, since a mixed-case row
+  /// would silently never match the lowercased address we look up at sign-in.
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("admins")
+}
