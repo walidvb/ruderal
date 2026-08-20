@@ -7,6 +7,7 @@ import { getNextAdminProps } from "@premieroctet/next-admin/appRouter";
 import { redirect } from "next/navigation";
 import { getAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import ImageUploadInput from "../image-upload-input";
 import { options } from "../options";
 import VideoUrlInput from "../video-url-input";
 import "../next-admin.css";
@@ -38,6 +39,8 @@ export default async function AdminPage({
   // `videoUrl` cannot be expressed without it.
   const customInputs = {
     videoUrl: <VideoUrlInput />,
+    thumbnailUrl: <ImageUploadInput folder="podcasts" />,
+    imageUrl: <ImageUploadInput folder="study-groups" />,
   } as unknown as AdminComponentProps["customInputs"];
 
   return (

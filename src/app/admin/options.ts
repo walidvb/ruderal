@@ -31,7 +31,7 @@ export const options: NextAdminOptions = {
           },
           thumbnailUrl: {
             helperText:
-              "Absolute URL, or a path inside the public `media` bucket (e.g. podcasts/ep-1.jpg).",
+              "Upload an image, or paste an absolute URL / a path inside the public `media` bucket.",
           },
           videoUrl: {
             helperText:
@@ -65,7 +65,7 @@ export const options: NextAdminOptions = {
           },
           imageUrl: {
             helperText:
-              "Absolute URL, or a path inside the public `media` bucket (e.g. study-groups/intro.jpg).",
+              "Upload an image, or paste an absolute URL / a path inside the public `media` bucket.",
           },
         },
       },
