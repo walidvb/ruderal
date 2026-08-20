@@ -11,6 +11,19 @@ const MASK_DURATION = 0.9;
 const STAGGER = 0.05;
 /** Plant pop-in. */
 const PLANT_SPRING = { type: "spring", duration: 0.7, bounce: 0.5 } as const;
+/** Idle sway once a plant has landed. */
+const PLANT_BREATH = {
+  duration: 2.4,
+  repeat: Infinity,
+  repeatType: "mirror",
+  ease: "easeInOut",
+} as const;
+/** How far a plant grows on the in-breath. */
+const BREATH_SCALE = 1.04;
+/** Soft shadow for plant units whose silhouette isn't a plain rectangle. */
+const PLANT_SHADOW = "drop-shadow(0 6px 8px rgb(0 0 0 / 0.22))";
+/** Title slide-down, timed to land alongside the plants. */
+const TITLE_SLIDE = { duration: 0.6, ease: "easeOut" } as const;
 /** Stands in for "everywhere" as the outer subpath of a knock-out clip path. */
 const EVERYWHERE = "M-100000,-100000H100000V100000H-100000Z";
 
@@ -135,6 +148,22 @@ function collectMaskReveals(
 const PLANT_UNIT_ATTRIBUTE = "data-home-plant-unit";
 
 /**
+ * A unit gets a drop-shadow only when its own silhouette is what would show:
+ * Figma already bakes a shadow into anything carrying its own `filter`, and a
+ * `<rect>` (the pattern-filled photo cutouts) would just cast its bounding
+ * box, not the plant inside it — exactly the rectangle a drop-shadow should
+ * avoid tracing.
+ */
+function tracesOwnOutline(unit: Element[]) {
+  return !unit.some(
+    (el) =>
+      el.tagName.toLowerCase() === "rect" ||
+      el.hasAttribute("filter") ||
+      el.querySelector("rect, [filter]"),
+  );
+}
+
+/**
  * Wraps every item in `#plants` in a plain `<g>`, so it can be scaled around its
  * own centre without disturbing the transforms Figma put on the artwork itself.
  */
@@ -157,6 +186,7 @@ function wrapPlantUnits(plants: Element) {
     wrapper.setAttribute(PLANT_UNIT_ATTRIBUTE, "");
     unit[0].before(wrapper);
     wrapper.append(...unit);
+    if (tracesOwnOutline(unit)) wrapper.style.filter = PLANT_SHADOW;
     wrappers.push(wrapper);
   }
 
@@ -187,8 +217,14 @@ export function HomeSvgAnimation({ artworkId, viewBox }: HomeSvgAnimationProps) 
 
     const { origin, reach } = measure(viewBox);
     const reveals = collectMaskReveals(svg, origin, reach);
-    const plants = svg.querySelector("#plants");
+    const plants = svg.querySelector<SVGElement>("#plants");
     const plantWrappers = plants ? wrapPlantUnits(plants) : [];
+    const title = document.getElementById("home-title");
+
+    // The artwork ships with #plants hidden (opacity:0) so a pre-hydration
+    // paint never flashes them at full size; now that the wrappers below are
+    // scaled to 0 individually, it's safe to hand opacity back to them.
+    if (plants) plants.style.opacity = "1";
 
     for (const wrapper of plantWrappers) {
       wrapper.style.transformBox = "fill-box";
@@ -203,6 +239,10 @@ export function HomeSvgAnimation({ artworkId, viewBox }: HomeSvgAnimationProps) 
     if (reduceMotion) {
       for (const reveal of reveals) reveal(1);
       for (const wrapper of plantWrappers) wrapper.style.transform = "none";
+      if (title) {
+        title.style.transform = "none";
+        title.style.opacity = "1";
+      }
       return;
     }
 
@@ -226,14 +266,29 @@ export function HomeSvgAnimation({ artworkId, viewBox }: HomeSvgAnimationProps) 
       reveals.length > 0 ? MASK_DURATION + (reveals.length - 1) * STAGGER : 0;
 
     plantWrappers.forEach((wrapper, index) => {
+      const landAt = plantsStart + index * STAGGER;
+      controls.push(
+        animate(wrapper, { scale: [0, 1] }, { ...PLANT_SPRING, delay: landAt }),
+      );
+      // Idle breathing picks up once the pop-in spring has settled.
       controls.push(
         animate(
           wrapper,
-          { scale: [0, 1] },
-          { ...PLANT_SPRING, delay: plantsStart + index * STAGGER },
+          { scale: [1, BREATH_SCALE, 1] },
+          { ...PLANT_BREATH, delay: landAt + PLANT_SPRING.duration },
         ),
       );
     });
+
+    if (title) {
+      controls.push(
+        animate(
+          title,
+          { y: [-24, 0], opacity: [0, 1] },
+          { ...TITLE_SLIDE, delay: plantsStart },
+        ),
+      );
+    }
 
     return () => {
       for (const control of controls) control.stop();
