@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { InfoBadge } from "./info-badge";
 
@@ -14,23 +14,29 @@ type InfoPanelProps = {
   body: string | null;
 };
 
-const GROW = { type: "spring", duration: 0.45, bounce: 0.12 } as const;
-const CONTENT_IN = { duration: 0.25, ease: "easeOut" } as const;
+const GROW = { type: "spring", stiffness: 260, damping: 26, mass: 1 } as const;
+const CONTENT_IN = { duration: 0.3, ease: [0.16, 1, 0.3, 1] } as const;
 const CONTENT_OUT = { duration: 0.15, ease: "easeIn" } as const;
+// Let the content start revealing a bit before the box spring has fully
+// settled, rather than waiting for it to come to a dead stop.
+const CONTENT_REVEAL_DELAY_MS = 300;
 
 export function InfoPanel({ label, title, body }: InfoPanelProps) {
   const [open, setOpen] = useState(false);
-  // Only true once the box has finished growing, so the content reveal
-  // happens after the resize rather than at the same time as it.
+  // Only true once the box is most of the way through growing, so the
+  // content reveal overlaps the tail of the resize instead of the start.
   const [showContent, setShowContent] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const timer = setTimeout(() => setShowContent(true), CONTENT_REVEAL_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [open]);
 
   return (
     <motion.div
       layout
       transition={GROW}
-      onLayoutAnimationComplete={() => {
-        if (open) setShowContent(true);
-      }}
       // Anchored flush to the right edge, so only the left corners are rounded.
       className={`rounded-l-card bg-surface shadow-card backdrop-blur-card fixed top-[118px] right-0 z-20 overflow-hidden ${
         open ? "w-[566px] max-w-[calc(100vw-2rem)] px-5 pt-5 pb-3" : "px-5 py-3"
