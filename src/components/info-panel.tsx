@@ -15,34 +15,45 @@ type InfoPanelProps = {
 };
 
 const GROW = { type: "spring", duration: 0.45, bounce: 0.12 } as const;
+const CONTENT_IN = { duration: 0.25, ease: "easeOut" } as const;
+const CONTENT_OUT = { duration: 0.15, ease: "easeIn" } as const;
 
 export function InfoPanel({ label, title, body }: InfoPanelProps) {
   const [open, setOpen] = useState(false);
+  // Only true once the box has finished growing, so the content reveal
+  // happens after the resize rather than at the same time as it.
+  const [showContent, setShowContent] = useState(false);
 
   return (
     <motion.div
       layout
       transition={GROW}
+      onLayoutAnimationComplete={() => {
+        if (open) setShowContent(true);
+      }}
       // Anchored flush to the right edge, so only the left corners are rounded.
       className={`rounded-l-card bg-surface shadow-card backdrop-blur-card fixed top-[118px] right-0 z-20 overflow-hidden ${
         open ? "w-[566px] max-w-[calc(100vw-2rem)] px-5 pt-5 pb-3" : "px-5 py-3"
       }`}
     >
       <AnimatePresence initial={false} mode="wait">
-        {open ? (
+        {showContent ? (
           <motion.div
             key="panel"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={CONTENT_IN}
             className="flex flex-col gap-2"
           >
             <div className="flex items-start justify-between gap-4">
               <InfoBadge label={label} />
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  setShowContent(false);
+                  setOpen(false);
+                }}
                 aria-label={`Close ${label}`}
                 className="mt-2 shrink-0 cursor-pointer"
               >
@@ -76,7 +87,7 @@ export function InfoPanel({ label, title, body }: InfoPanelProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={CONTENT_OUT}
             className="flex cursor-pointer items-start"
           >
             <InfoBadge label={label} />
